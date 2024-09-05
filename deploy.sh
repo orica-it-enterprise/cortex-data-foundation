@@ -17,10 +17,31 @@
 # Exit on error.
 set -e
 
-log_bucket=$1
+_CONFIG_FILE="./config/staging-config.json"
+log_bucket=""
+
+while getopts "c:b:" opt; do
+    case $opt in
+        c)
+            _CONFIG_FILE="${OPTARG}"
+            ;;
+        b)
+            _CONFIG_FILE="${OPTARG}"
+            ;;
+        ?)
+            echo "Invalid option: ${OPTARG}"
+            ;;
+    esac
+done
+
+if [ "$log_bucket" == "" ]
+then
+    echo "Please provide the log bucket name via -b"
+fi
+
 echo "Deploying Cortex Data Foundation."
 
-cloud_build_project=$(cat "config/config.json" | python3 -c "import json,sys; print(str(json.load(sys.stdin)['projectIdSource']))" 2>/dev/null || echo "")
+cloud_build_project=$(cat $_CONFIG_FILE | python3 -c "import json,sys; print(str(json.load(sys.stdin)['projectIdSource']))" 2>/dev/null || echo "")
 if [[ "${cloud_build_project}" == "" ]]
 then
     echo "ERROR: Cortex Data Foundation is not configured."
@@ -41,7 +62,7 @@ set +e
 echo -e "\n\033[0;32m\033[1mPlease wait while Data Foundation is being deployed...\033[0m\n"
 gcloud builds submit --config=cloudbuild.yaml --suppress-logs \
     --project "${cloud_build_project}" \
-    --substitutions=_GCS_BUCKET="${_GCS_BUCKET}",_CUSTOM_SERVICE_ACCOUNT="${_CUSTOM_SERVICE_ACCOUNT}" . \
+    --substitutions=_GCS_BUCKET="${_GCS_BUCKET}",_CUSTOM_SERVICE_ACCOUNT="${_CUSTOM_SERVICE_ACCOUNT}",_CONFIG_FILE="${_CONFIG_FILE}" . \
     && _SUCCESS="true"
 if [[ "${_SUCCESS}" != "true" ]]; then
     echo -e "\n🛑 Data Foundation deployment has failed. 🛑"
