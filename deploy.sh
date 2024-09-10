@@ -26,7 +26,7 @@ while getopts "c:b:" opt; do
             _CONFIG_FILE="${OPTARG}"
             ;;
         b)
-            _CONFIG_FILE="${OPTARG}"
+            log_bucket="${OPTARG}"
             ;;
         ?)
             echo "Invalid option: ${OPTARG}"
