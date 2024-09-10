@@ -490,7 +490,7 @@ Run the Build command with the target log bucket.
 
 ```bash
 gcloud builds submit --project <execution project, likely the source> \
-    --substitutions=_GCS_BUCKET=<Bucket for logs - Cloud Build Service Account needs access to write here>,_CONFIG_FILE=./config/[CONFIG_FILE]
+    --substitutions=_GCS_BUCKET=<Bucket for logs - Cloud Build Service Account needs access to write here>,_CUSTOM_SERVICE_ACCOUNT=${_CUSTOM_SERVICE_ACCOUNT},_CONFIG_FILE=./config/[CONFIG_FILE]
 ```
 
 You can follow the main Build process from the first link of logs:
