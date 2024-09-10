@@ -21,10 +21,25 @@ set -e
 
 echo -e "\n============ 🦄🦄🦄 Getting logs and configs! 🔪🔪🔪 ============\n"
 
-project_id=$(jq -r ."projectIdSource" "config/config.json")
+_CONFIG_FILE="./config/staging-config.json"
+
+while getopts "c:" opt; do
+    case $opt in
+        c)
+            _CONFIG_FILE="${OPTARG}"
+            ;;
+        ?)
+            echo "Invalid option: ${OPTARG}"
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+project_id=$(jq -r ."projectIdSource" $_CONFIG_FILE)
 if [[ "${project_id}" == "" ]]
 then
-    echo "ERROR: Configuration in config/config.json is invalid. 'projectIdSource' is empty."
+    echo "ERROR: Configuration in $_CONFIG_FILE is invalid. 'projectIdSource' is empty."
     exit 1
 fi
 
@@ -48,7 +63,7 @@ echo ""
 cp -f config/config.json to_be_uploaded.json
 if [ $? -ne 0 ]
     then
-        echo "Warning: config.json not found in your local."
+        echo "Warning: $_CONFIG_FILE not found in your local."
         exit 1
     else
         echo "Your configs are in to_be_uploaded.json. Please share it with cortex-support@google.com."

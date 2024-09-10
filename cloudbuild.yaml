@@ -53,7 +53,7 @@ steps:
       _SQL_FLAVOUR_=$(jq -r ."SAP.SQLFlavor" ${_CONFIG_FILE})
       _SQL_FLAVOUR_UP_=$(echo ${_SQL_FLAVOUR_} | tr '[:lower:]' '[:upper:]')
       if [[ ${_NO_TEST_DATA} != "true" && ${_TEST_DATA_} == "true" && ${_DEPLOY_SAP_} == "true" && ${_SQL_FLAVOUR_} != "union" ]]; then
-        python3 src/common/create_test_harness.py --workload "SAP" --dataset raw${_SQL_FLAVOUR_UP_}
+        python3 src/common/create_test_harness.py --workload "SAP" --dataset raw${_SQL_FLAVOUR_UP_} --config-file ${_CONFIG_FILE}
       else
         echo "==Skipping Test Harness for SAP=="
       fi
@@ -66,7 +66,7 @@ steps:
       _DEPLOY_SFDC_=$(jq -r ."deploySFDC" ${_CONFIG_FILE})
       _TEST_DATA_=$(jq -r ."testData" ${_CONFIG_FILE})
       if [[ ${_NO_TEST_DATA} != "true" && ${_TEST_DATA_} == "true" && ${_DEPLOY_SFDC_} == "true" ]]; then
-        python3 src/common/create_test_harness.py --workload "SFDC" --dataset "raw"
+        python3 src/common/create_test_harness.py --workload "SFDC" --dataset "raw" --config-file ${_CONFIG_FILE}
       else
         echo "==Skipping Test Harness for SFDC=="
       fi
@@ -242,7 +242,6 @@ logsBucket: "gs://${_GCS_BUCKET}"
 serviceAccount: "${_CUSTOM_SERVICE_ACCOUNT}"
 timeout: 32400s
 substitutions:
-  _CONFIG_FILE: "config/config.json"
   _DEPLOY_SAP_ML_MODELS: "false"
   _NO_TEST_DATA: "false"
 options:
